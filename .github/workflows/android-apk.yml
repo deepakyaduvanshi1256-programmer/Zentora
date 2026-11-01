@@ -39,11 +39,13 @@ jobs:
 
       - name: Build web app and sync into the Android project
         run: npm run build:android
-- name: Build debug APK
-  working-directory: ui/android
-  run: |
-    chmod +x gradlew
-    ./gradlew assembleDebug --no-daemon
+
+      - name: Build debug APK
+        working-directory: ui/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
