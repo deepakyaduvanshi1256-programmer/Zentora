@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Freelancing 24x7</string>
+    <string name="title_activity_main">Freelancing 24x7</string>
+    <string name="package_name">com.freelancing24x7.app</string>
+    <string name="custom_url_scheme">com.freelancing24x7.app</string>
+</resources>

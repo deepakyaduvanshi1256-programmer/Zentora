@@ -1,0 +1,127 @@
+/* Shared Zentora Neumorphism theme for every SweetAlert dialog */
+.swal2-container.swal2-backdrop-show {
+  background: rgba(3, 8, 18, .78) !important;
+  backdrop-filter: blur(10px);
+}
+
+.swal2-popup {
+  width: min(31rem, calc(100vw - 2rem)) !important;
+  border: 1px solid rgba(148, 163, 184, .09) !important;
+  border-radius: 26px !important;
+  padding: 2rem 1.5rem 1.35rem !important;
+  background: linear-gradient(145deg, #1b2639, #151d2d) !important;
+  color: #e5e7eb !important;
+  box-shadow: 18px 18px 38px rgba(2, 6, 14, .82), -10px -10px 24px rgba(48, 62, 86, .18) !important;
+}
+
+.swal2-title {
+  color: #f8fafc !important;
+  font-size: 1.45rem !important;
+  font-weight: 800 !important;
+}
+
+.swal2-html-container,
+.swal2-input-label {
+  color: #94a3b8 !important;
+  font-size: .95rem !important;
+}
+
+.swal2-actions {
+  gap: .75rem;
+}
+
+.swal2-confirm,
+.swal2-cancel,
+.swal2-deny {
+  min-width: 8rem;
+  border: 0 !important;
+  border-radius: 14px !important;
+  padding: .72rem 1.2rem !important;
+  font-weight: 750 !important;
+  box-shadow: 7px 7px 14px rgba(2, 6, 14, .72), -4px -4px 10px rgba(71, 85, 105, .18) !important;
+}
+
+.swal2-confirm {
+  background: linear-gradient(145deg, #22d3ee, #0891b2) !important;
+  color: #07131d !important;
+}
+
+.swal2-cancel {
+  background: linear-gradient(145deg, #334155, #202a3a) !important;
+  color: #e5e7eb !important;
+}
+
+.swal2-confirm:hover,
+.swal2-cancel:hover,
+.swal2-deny:hover {
+  transform: translateY(-2px);
+}
+
+.swal2-confirm:focus,
+.swal2-cancel:focus,
+.swal2-deny:focus {
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, .18), 7px 7px 14px rgba(2, 6, 14, .72) !important;
+}
+
+.swal2-input,
+.swal2-textarea {
+  width: calc(100% - 2rem) !important;
+  border: 1px solid rgba(148, 163, 184, .08) !important;
+  border-radius: 14px !important;
+  background: #111827 !important;
+  color: #f8fafc !important;
+  box-shadow: inset 4px 4px 8px rgba(2, 6, 14, .78), inset -3px -3px 7px rgba(71, 85, 105, .13) !important;
+}
+
+.swal2-input::placeholder,
+.swal2-textarea::placeholder {
+  color: #64748b !important;
+}
+
+.swal2-input:focus,
+.swal2-textarea:focus {
+  border-color: rgba(34, 211, 238, .55) !important;
+  box-shadow: inset 4px 4px 8px rgba(2, 6, 14, .78), 0 0 0 3px rgba(34, 211, 238, .09) !important;
+}
+
+.swal2-icon {
+  box-shadow: 8px 8px 16px rgba(2, 6, 14, .7), -5px -5px 12px rgba(71, 85, 105, .16);
+  border-radius: 50%;
+}
+
+.swal2-success {
+  border-color: #34d399 !important;
+}
+
+.swal2-success-line-tip,
+.swal2-success-line-long {
+  background-color: #34d399 !important;
+}
+
+.swal2-success-ring {
+  border-color: rgba(52, 211, 153, .3) !important;
+}
+
+.swal2-warning {
+  border-color: #fbbf24 !important;
+  color: #fbbf24 !important;
+}
+
+.swal2-error {
+  border-color: #fb7185 !important;
+}
+
+.swal2-error-line {
+  background-color: #fb7185 !important;
+}
+
+.swal2-info {
+  border-color: #22d3ee !important;
+  color: #22d3ee !important;
+}
+
+.swal2-close {
+  color: #94a3b8 !important;
+  border-radius: 50%;
+  box-shadow: 4px 4px 9px rgba(2, 6, 14, .7), -3px -3px 8px rgba(71, 85, 105, .14);
+}

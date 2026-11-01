@@ -1,0 +1,73 @@
+name: Build Android APK
+
+# Builds the Freelancing 24x7 Android app on GitHub's servers (they have the Android SDK; no local setup needed).
+# Run it: GitHub repo -> Actions -> "Build Android APK" -> Run workflow. Download the APK from the run's "Artifacts".
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["ui/**", ".github/workflows/android-apk.yml"]
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ui
+    env:
+      # Set repository variable API_URL (Settings -> Secrets and variables -> Actions -> Variables) to your backend's https address.
+      VITE_API_URL: ${{ vars.API_URL || 'https://freelancingportal-freelance-marketplace-erwc.onrender.com' }}
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app and sync into the Android project
+        run: npm run build:android
+
+      - name: Build debug APK
+        working-directory: ui/android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: freelancing24x7-debug-apk
+          path: ui/android/app/build/outputs/apk/debug/app-debug.apk
+
+      # ---- Optional signed release APK: add these 4 repository SECRETS to enable ----
+      #   ANDROID_KEYSTORE_BASE64   (base64 of your .jks file)   ANDROID_KEYSTORE_PASSWORD
+      #   ANDROID_KEY_ALIAS                                      ANDROID_KEY_PASSWORD
+      - name: Build signed release APK
+        if: env.HAS_KEYSTORE == 'true'
+        working-directory: ui/android
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/release.jks"
+          export ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/release.jks"
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Upload release APK
+        if: env.HAS_KEYSTORE == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: freelancing24x7-release-apk
+          path: ui/android/app/build/outputs/apk/release/*.apk
