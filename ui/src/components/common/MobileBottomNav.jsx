@@ -13,9 +13,9 @@ const TABS = {
     ["/client-review-bids", "bi-hammer", "Bids"], ["/notifications", "bi-bell", "Alerts"], ["/client-profile", "bi-person", "Profile"],
   ],
   admin: [
-    ["/admin-dashboard", "bi-speedometer2", "Home"], ["/admin-project", "bi-briefcase", "Projects"],
-    ["/admin-users", "bi-people", "Users"], ["/admin-email", "bi-envelope", "Email"], ["/notifications", "bi-bell", "Alerts"],
-  ],
+  ["/admin-dashboard", "bi-speedometer2", "Home"], ["/admin-project", "bi-briefcase", "Projects"],
+  ["/admin-users", "bi-people", "Users"], ["/notifications", "bi-bell", "Alerts"],
+],
 };
 
 // Fixed bottom tab bar for logged-in users on phones / the Android app (hidden on desktop widths).

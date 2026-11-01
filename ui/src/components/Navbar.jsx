@@ -156,11 +156,11 @@ const AdminMenu = () =>{
                    Bids
                     </Link>
                   </li>
-                  <li className="nav-item">
+                  {/* <li className="nav-item">
                     <Link className="nav-link"  to="/admin-email">
                      Email
                     </Link>
-                  </li>
+                  </li> */}
                   <li className="nav-item">
                     <Link className="nav-link"  to="/admin-profile">
                      Profile
