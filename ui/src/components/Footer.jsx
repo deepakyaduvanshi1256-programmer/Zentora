@@ -60,7 +60,7 @@ const Footer = () => (
         <div className="col-12 col-md-6 col-lg-3">
           <h3 className="h5">Contact</h3>
           <a
-            href="mailto:deepakyaduvanshi12@gmail.com"
+            href="mailto:deepakyaduvanshi1256@gmail.com"
             className="d-block text-decoration-none text-white-50 mb-2"
           >
             <i className="bi bi-envelope me-2" />

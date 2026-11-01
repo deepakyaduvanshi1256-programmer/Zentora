@@ -126,7 +126,7 @@ const Contact = () => {
                   <i className="bi bi-envelope-fill me-2" />
                   <a
                     className="text-white text-decoration-none"
-                    href="mailto:deepakyaduvanshi12@gmail.com"
+                    href="mailto:deepakyaduvanshi1256@gmail.com"
                   >
                     deepakyaduvanshi1256@gmail.com
                   </a>
