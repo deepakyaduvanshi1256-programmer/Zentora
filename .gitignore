@@ -23,3 +23,8 @@ pnpm-debug.log*
 .vscode/
 .idea/
 .DS_Store
+
+# Android Release Signing
+*.jks
+*.keystore
+zentora-release-base64.txt
