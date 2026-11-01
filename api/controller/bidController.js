@@ -148,6 +148,9 @@ export const submitProjectForReview = async (req, res) => {
         const { projectId, message, deliveryLink } = req.body;
         if (!message?.trim()) return res.json({ code: 400, success: false, message: "Add a completion message for the client", result: "", error: true });
         const uploadedFile = req.file;
+        if (!uploadedFile && !deliveryLink?.trim()) {
+            return res.json({ code: 400, success: false, message: "Upload a delivery file or add a delivery link", result: "", error: true });
+        }
         const deliveryFileUrl = uploadedFile ? `${req.protocol}://${req.get("host")}/uploads/deliveries/${encodeURIComponent(uploadedFile.filename)}` : null;
         const deliveryData = {
             status: "awaiting_review",
@@ -166,7 +169,7 @@ export const submitProjectForReview = async (req, res) => {
         const client = await userModel.findById(project.clientId);
         sendProjectEmail({ to: client?.email, subject: `Delivery ready: ${project.title}`, text: `${message.trim()}${deliveryLink?.trim() ? `\nDelivery link: ${deliveryLink.trim()}` : ""}${deliveryFileUrl ? `\nUploaded file: ${deliveryFileUrl}` : ""}` }).catch(() => {});
         const developer = await userModel.findById(developerId);
-        userModel.find({ type: "admin", isDeleted: { $ne: true } }).select("email").then((admins) => {
+        getAdminRecipients().then((admins) => {
             sendBulkProjectEmails(admins.map((admin) => admin.email), { subject: `Project delivered: ${project.title}`, text: `${developer?.name || developer?.email || "Developer"} submitted delivery for review on "${project.title}".` });
         }).catch(() => {});
         res.json({ code: 200, success: true, message: "Project sent to client for review", result: project, error: false });
@@ -205,6 +208,12 @@ export const getMyBids = async (req, res) => {
         const projMap = {};
         projects.forEach(p => { projMap[p._id.toString()] = p; });
         const result = bids.map(b => ({ ...b.toObject(), project: projMap[b.projectId] || null }));
+        await Promise.all(result
+            .filter(b => b.project?.status === "completed" && b.status === "accepted")
+            .map(b => BidModel.updateOne({ _id: b._id }, { status: "completed" })));
+        result.forEach(b => {
+            if (b.project?.status === "completed" && b.status === "accepted") b.status = "completed";
+        });
         res.json({ code: 200, success: true, message: "Bids fetched", result, error: false });
     } catch (err) {
         res.json({ code: 500, success: false, message: "Internal Server Error", result: "", error: true });

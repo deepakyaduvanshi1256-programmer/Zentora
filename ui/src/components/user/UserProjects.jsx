@@ -50,9 +50,28 @@ const UserProjects = () => {
     }
   };
   const sendProjectMessage = (project) => setChatProject(project);
+  const startProject = async (project) => {
+    try {
+      const res = await axiosInstance.post("/developer-confirm-project-start", {
+        projectId: project._id,
+      });
+      if (res?.data?.success) {
+        await Swal.fire({ title: "Project started", text: res.data.message, icon: "success" });
+        fetchMine();
+      } else {
+        await Swal.fire({ title: "Unable to start project", text: res?.data?.message, icon: "error" });
+      }
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: error.response?.data?.message || "Something went wrong",
+        icon: "error",
+      });
+    }
+  };
   const submitForReview = async (project) => {
     const result = await Swal.fire({
-      title: "Submit project for client review?",
+      title: "Deliver Project?",
       input: "textarea",
       inputLabel: "Completion message",
       inputPlaceholder: "Describe what you completed and any delivery notes...",
@@ -63,8 +82,8 @@ const UserProjects = () => {
     });
     if (!result.isConfirmed) return;
     const delivery = await Swal.fire({
-      title: "Attach delivery",
-      html: `<input id="deliveryLink" class="swal2-input" type="url" placeholder="File or project link (optional)"><input id="deliveryFile" class="swal2-file" type="file" accept=".zip,.rar,.7z,.pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.mp4,.webm">`,
+      title: "Attach project delivery",
+      html: `<input id="deliveryLink" class="swal2-input" type="url" placeholder="Delivery link (optional)"><input id="deliveryFile" class="swal2-file" type="file" accept=".zip,.rar,.7z,.pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.mp4,.webm">`,
       showCancelButton: true,
       confirmButtonText: "Send delivery",
       preConfirm: () => ({
@@ -176,7 +195,7 @@ const UserProjects = () => {
     workView === "completed"
       ? myProjects.filter((project) => project.status === "completed")
       : myProjects.filter((project) =>
-          ["assigned", "in_progress"].includes(project.status),
+          ["assigned", "in_progress", "awaiting_review"].includes(project.status),
         );
   const cards = tab === "open" ? openProjects : mineCards;
 
@@ -199,7 +218,7 @@ const UserProjects = () => {
             Find projects and place your bids.
           </p>
         </header>
-        <div className="d-flex gap-2 mb-4" role="group">
+        <div className="talent-work-tabs d-flex align-items-center gap-2 mb-4" role="group">
           <button
             className={`btn rounded-pill ${tab === "open" ? "btn-warning shadow-sm" : "btn-outline-secondary"}`}
             onClick={() => setTab("open")}
@@ -214,7 +233,7 @@ const UserProjects = () => {
           </button>
           {tab === "mine" && (
             <div
-              className="d-flex gap-2 ms-lg-2 mt-2 mt-md-0 flex-wrap"
+              className="talent-work-status d-flex align-items-center gap-2 ms-lg-2"
               role="group"
             >
               <button
@@ -335,6 +354,13 @@ const UserProjects = () => {
                     </div>
                     <button
                       type="button"
+                      className="talent-primary-btn w-100 mt-3"
+                      onClick={() => startProject(project)}
+                    >
+                      <i className="bi bi-play-fill me-2"></i>Start Project
+                    </button>
+                    <button
+                      type="button"
                       className="talent-card-action w-100 mt-3"
                       onClick={() => sendProjectMessage(project)}
                     >
@@ -353,8 +379,7 @@ const UserProjects = () => {
                       className="talent-card-action w-100 mt-3"
                       onClick={() => submitForReview(project)}
                     >
-                      <i className="bi bi-send-check-fill me-2"></i>Submit Work
-                      for Review
+                      <i className="bi bi-send-check-fill me-2"></i>Deliver Project
                     </button>
                     <button
                       type="button"

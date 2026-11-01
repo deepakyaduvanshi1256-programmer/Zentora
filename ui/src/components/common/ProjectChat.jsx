@@ -13,6 +13,7 @@ const ProjectChat = ({ project, onClose }) => {
   const [tappedMessage, setTappedMessage] = useState(null);
   const socketRef = useRef(null);
   const endRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     let active = true;
@@ -58,18 +59,53 @@ const ProjectChat = ({ project, onClose }) => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    const updateViewport = () => {
+      const height = viewport?.height || window.innerHeight;
+      document.documentElement.style.setProperty("--project-chat-viewport-height", `${height}px`);
+      if (document.activeElement === inputRef.current) {
+        requestAnimationFrame(() => {
+          endRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
+        });
+      }
+    };
+
+    updateViewport();
+    viewport?.addEventListener("resize", updateViewport);
+    window.addEventListener("resize", updateViewport);
+
+    return () => {
+      viewport?.removeEventListener("resize", updateViewport);
+      window.removeEventListener("resize", updateViewport);
+      document.documentElement.style.removeProperty("--project-chat-viewport-height");
+    };
+  }, []);
+
   const sendMessage = () => {
     const message = text.trim();
-    if (!message || sending || !socketRef.current?.connected) return;
+    if (!message || sending) return;
     setSending(true);
-    socketRef.current.emit(
-      "project-message",
-      { projectId: project._id, message },
-      (response) => {
-        if (response?.success) setText("");
-        setSending(false);
-      },
-    );
+    if (socketRef.current?.connected) {
+      socketRef.current.emit(
+        "project-message",
+        { projectId: project._id, message },
+        (response) => {
+          if (response?.success) setText("");
+          setSending(false);
+        },
+      );
+      return;
+    }
+    axiosInstance
+      .post("/project-message", { projectId: project._id, message })
+      .then((response) => {
+        if (response?.data?.success) {
+          setText("");
+          setMessages((current) => [...current, response.data.result]);
+        }
+      })
+      .finally(() => setSending(false));
   };
 
   const storedUser = JSON.parse(localStorage.getItem("info") || "{}");
@@ -84,7 +120,7 @@ const ProjectChat = ({ project, onClose }) => {
   return (
     <div
       onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}
-      className="d-flex align-items-center justify-content-center p-3"
+      className="project-chat-overlay d-flex align-items-center justify-content-center"
       style={{
         position: "fixed",
         inset: 0,
@@ -97,7 +133,7 @@ const ProjectChat = ({ project, onClose }) => {
         className="d-flex flex-column"
         style={{
           width: "min(680px, 100%)",
-          height: "min(720px, calc(100vh - 32px))",
+          height: "min(720px, calc(100dvh - 32px))",
           overflow: "hidden",
           borderRadius: "28px",
           background: neuBackground,
@@ -119,7 +155,7 @@ const ProjectChat = ({ project, onClose }) => {
           >✕</button>
         </header>
         <div
-          className="flex-grow-1 overflow-auto p-4"
+          className="project-chat-messages flex-grow-1 overflow-auto p-4"
           style={{ background: neuBackground }}
         >
           {messages.length === 0 && (
@@ -174,13 +210,19 @@ const ProjectChat = ({ project, onClose }) => {
           })}
           <div ref={endRef}></div>
         </div>
-        <div className="d-flex gap-3 p-3 px-4" style={{ background: neuBackground }}>
+        <div className="project-chat-composer d-flex gap-3 p-3 px-4" style={{ background: neuBackground }}>
           <input
+            ref={inputRef}
             className="form-control rounded-pill"
             value={text}
             onChange={(event) => setText(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") sendMessage();
+            }}
+            onFocus={() => {
+              requestAnimationFrame(() => {
+                endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+              });
             }}
             placeholder="Type a project message..."
             style={{ border: 0, borderRadius: "22px", background: neuBackground, boxShadow: neuInset, padding: "12px 18px", color: "#273244" }}

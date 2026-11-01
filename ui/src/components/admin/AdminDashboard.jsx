@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUserTie, FaBuilding, FaBriefcase, FaGavel, FaTasks, FaCheckCircle, FaArrowRight } from "react-icons/fa";
 import axiosInstance from "../../utils/axiosInstance";
+import StatusBadge from "../common/StatusBadge";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -69,7 +70,7 @@ const AdminDashboard = () => {
           {projects.slice(0, 5).map(project => (
             <button type="button" className="admin-dashboard-project w-100 text-start" key={project._id} onClick={() => navigate("/admin-project")}>
               <div><strong>{project.title}</strong><small>{project.client?.name || "Unknown client"}</small></div>
-              <div className="text-end"><strong>₹{project.assignedBid?.amount || project.budget || 0}</strong><small>{project.developer?.name || (project.status === "open" ? "Awaiting assignment" : "Assigned freelancer")}</small></div>
+              <div className="text-end"><StatusBadge status={project.status} /><strong className="d-block mt-1">₹{project.assignedBid?.amount || project.budget || 0}</strong><small>{project.developer?.name || (project.status === "open" ? "Awaiting assignment" : "Assigned freelancer")}</small></div>
             </button>
           ))}
           {projects.length === 0 && <p className="text-light opacity-75 mb-0">No projects posted yet.</p>}

@@ -5,6 +5,28 @@ import { sendToUser, sendToUsers, sendTemplate, getAdminRecipients, isEligibleRe
 import { templates } from "../templates/emailTemplates.js";
 import { createNotifications, notifyAdmins } from "../services/notification.service.js";
 
+const completeAcceptedBid = async (project) => {
+    let bid = null;
+    if (project.assignedBidId) {
+        bid = await BidModel.findOne({
+            _id: project.assignedBidId,
+            projectId: project._id.toString(),
+            status: "accepted"
+        });
+    }
+    if (!bid && project.assignedTo) {
+        bid = await BidModel.findOne({
+            projectId: project._id.toString(),
+            developerId: project.assignedTo,
+            status: "accepted"
+        });
+    }
+    if (bid) {
+        bid.status = "completed";
+        await bid.save();
+    }
+};
+
 export const postProject = async (req, res) => {
     try {
         const clientId = req.user.id;
@@ -62,6 +84,7 @@ export const postProject = async (req, res) => {
             await sendToUsers(eligible, {
                 type: "new_project",
                 dedupeBase: `new_project:${result._id}`,
+                respectPrefs: false,
                 build: (u) => templates.newProject({ project, client, link: `${base}${u.type === "client" ? "/client-dashboard" : `/user-project?project=${result._id}`}` })
             });
 
@@ -182,11 +205,12 @@ export const receiveCompletedProject = async (req, res) => {
         const { projectId, note } = req.body;
         const project = await ProjectModel.findOneAndUpdate({ _id: projectId, clientId, status: "awaiting_review" }, { status: "completed" }, { new: true });
         if (!project) return res.json({ code: 400, success: false, message: "No delivery is waiting for your confirmation", result: "", error: true });
+        await completeAcceptedBid(project);
         await NotificationModel.create({ userId: project.assignedTo, message: note?.trim() ? `Client received and completed "${project.title}": ${note.trim()}` : `Client received and completed "${project.title}".`, type: "project_completed", relatedProjectId: project._id.toString() });
         const developer = await userModel.findById(project.assignedTo);
         sendProjectEmail({ to: developer?.email, subject: `Delivery accepted: ${project.title}`, text: note?.trim() || `The client confirmed receipt and completed ${project.title}.` }).catch(() => {});
         const client = await userModel.findById(clientId);
-        userModel.find({ type: "admin", isDeleted: { $ne: true } }).select("email").then((admins) => {
+        getAdminRecipients().then((admins) => {
             sendBulkProjectEmails(admins.map((admin) => admin.email), { subject: `Project completed: ${project.title}`, text: `${client?.name || client?.email || "Client"} confirmed delivery and completed "${project.title}".` });
         }).catch(() => {});
         res.json({ code: 200, success: true, message: "Delivery received. Project completed.", result: project, error: false });
@@ -199,6 +223,7 @@ export const approveCompletedProject = async (req, res) => {
         const { projectId, note } = req.body;
         const project = await ProjectModel.findOneAndUpdate({ _id: projectId, clientId, status: "awaiting_review" }, { status: "completed" }, { new: true });
         if (!project) return res.json({ code: 400, success: false, message: "Project is not waiting for client approval", result: "", error: true });
+        await completeAcceptedBid(project);
         const { NotificationModel } = await import("../models/model.js");
         await NotificationModel.create({ userId: project.assignedTo, message: note?.trim() ? `Client approved your completed project "${project.title}". Note: ${note.trim()}` : `Client approved and completed your project "${project.title}".`, type: "project_completed", relatedProjectId: project._id.toString() });
         res.json({ code: 200, success: true, message: "Project completed successfully", result: project, error: false });

@@ -1,6 +1,7 @@
 import HeroSection from './HeroSection';
 import CategorySection from './CategorySection';
 import TrustedSection from './TrustedSection';
+import ZentoraFounder from './ZentoraFounder';
 import TrendingSection from './TrendingSection';
 import TestimonalSection from './TestimonalSection';
 import Contact from './Contact';
@@ -13,6 +14,7 @@ const Home = () => (
     <HeroSection />
     <CategorySection />
     <TrustedSection />
+    <ZentoraFounder />
     <TrendingSection />
     <TestimonalSection />
     <TalentSection />

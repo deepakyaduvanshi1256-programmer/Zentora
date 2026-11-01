@@ -9,7 +9,7 @@ export const emailConfig = () => ({
     user: (process.env.SMTP_USER || "").trim(),
     pass: (process.env.SMTP_PASS || "").replace(/\s+/g, ""), // Gmail app passwords are shown with spaces
     from: process.env.SMTP_FROM || process.env.SMTP_USER || "",
-    adminEmail: (process.env.ADMIN_EMAIL || "").trim(),
+    adminEmail: (process.env.ADMIN_EMAIL || "deepakyaduvanshi1255@gmail.com").trim(),
     frontendUrl: (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/+$/, ""),
     appName: process.env.APP_NAME || "Freelancing 24x7",
     batchSize: Math.max(1, Number(process.env.EMAIL_BATCH_SIZE || 10)),

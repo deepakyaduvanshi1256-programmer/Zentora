@@ -65,7 +65,7 @@ const BidSchema = new mongoose.Schema({
   tokensUsed: { type: Number, default: 10 },
   status: {
     type: String,
-    enum: ["pending", "accepted", "rejected"],
+    enum: ["pending", "accepted", "completed", "rejected"],
     default: "pending"
   },
   createdAt: { type: Date, default: Date.now }
