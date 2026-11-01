@@ -35,7 +35,7 @@ import NativeBridge from './components/common/NativeBridge'
 import GlobalLoader from './components/common/GlobalLoader'
 import MobileBottomNav from './components/common/MobileBottomNav'
 import Notifications from './components/Notifications'
-import AdminEmail from './components/admin/AdminEmail'
+
 
 const RouteEffects = () => {
   const location = useLocation()
@@ -75,7 +75,6 @@ const App = () => {
           <Route path='/admin-bids' element={<RequireAuth role="admin"><AdminBids /></RequireAuth>} />
           <Route path='/admin-profile' element={<RequireAuth role="admin"><AdminProfile /></RequireAuth>} />
           <Route path='/admin-plans' element={<RequireAuth role="admin"><AdminPlans /></RequireAuth>} />
-          <Route path='/admin-email' element={<RequireAuth role="admin"><AdminEmail /></RequireAuth>} />
 
           {/* any logged-in role */}
           <Route path='/notifications' element={<RequireAuth role={['admin','client','user']}><Notifications /></RequireAuth>} />
